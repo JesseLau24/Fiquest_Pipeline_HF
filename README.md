@@ -12,7 +12,6 @@ Unlike traditional audio classifiers, our **Sentinel** engine utilizes **Multi-S
 ### Hugging Face Repos for the two models:
 
 For AI Detection:
-
 https://huggingface.co/JesseHuang922/VoxSentinel-Base
 
 For Emition Detection:
@@ -62,10 +61,19 @@ pip install torch transformers librosa faster-whisper gradio plotly pandas reque
 ollama pull llama3.2
 ```
 
-### 🚦 UsageLaunch the Anti-Fraud Command Center:Bashpython app.py
+### 🚦 UsageLaunch the Anti-Fraud Command Center:
+
+```bash
+python app.py
+```
 
 Once running, access the local dashboard at http://localhost:7860. 
 
 Upload an audio file or use the microphone to start a full forensic scan.
+
+Something like this would show:
+
+![alt text](<Screenshot from 2026-04-23 22-57-48.png>)
+
 
 Special thanks to the open-source community for providing the foundational models used in this defense taskforce.
