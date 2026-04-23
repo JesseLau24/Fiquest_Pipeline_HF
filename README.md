@@ -75,5 +75,6 @@ Something like this would show:
 
 ![alt text](<Screenshot from 2026-04-23 22-57-48.png>)
 
+![alt text](image.png)
 
 Special thanks to the open-source community for providing the foundational models used in this defense taskforce.
