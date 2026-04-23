@@ -92,7 +92,21 @@ class SentinelEngine:
             # 4. Inference
             with torch.no_grad():
                 logits = self.model(input_values)
+                
+                # --- ADD DEBUG PRINT HERE ---
+                print("-" * 30)
+                print(f"DEBUG - Sentinel Logits Raw: {logits}") 
+                print(f"DEBUG - Logits Shape: {logits.shape}")
+                # ----------------------------
+
+                # Softmax to get confidence scores
                 probs = torch.softmax(logits, dim=-1)
+                
+                # --- ADD PROBS PRINT HERE ---
+                print(f"DEBUG - Sentinel Probs: {probs}")
+                print("-" * 30)
+                # ----------------------------
+
                 pred_idx = torch.argmax(probs, dim=-1).item()
                 confidence = probs[0][pred_idx].item()
 

@@ -46,16 +46,25 @@ def process_audio(audio_path):
     try:
         # 1. AI Clone Detection
         sentinel_report = sentinel_hw.detect_voice_clone(audio_path)
-        is_ai = sentinel_report.get("is_fake", False)
+        
+        # 【修正映射逻辑】 
+        # 根据模型卡片与Debug输出: 0=Fake (Synthetic), 1=Real (Human)
+        is_ai = sentinel_report.get("is_fake", False) # 确保 engine.py 中 pred_idx=0 时 is_fake 为 True
         ai_conf = float(sentinel_report.get("confidence", 0.0))
-        ai_label = {"AI Synthetic": ai_conf, "Real Human": 1.0 - ai_conf}
+        
+        # 根据判定结果构建 UI 标签显示
+        if is_ai:
+            # 如果判定为假，conf 就是 AI 合成的概率
+            ai_label = {"AI Synthetic": ai_conf, "Real Human": 1.0 - ai_conf}
+        else:
+            # 如果判定为真，conf 就是真人的概率
+            ai_label = {"Real Human": ai_conf, "AI Synthetic": 1.0 - ai_conf}
 
         # 2. Transcription
         stt_report = stt_hw.transcribe(audio_path)
         transcript = stt_report.get("text", "No speech detected.")
 
         # 3. Full Emotion Timeline Analysis
-        # 这里调用 predict_timeline，它返回的是每一秒的最显著情绪
         timeline = emo_hw.predict_timeline(audio_path)
         
         if not timeline:
@@ -64,8 +73,6 @@ def process_audio(audio_path):
             
         df = pd.DataFrame(timeline)
         
-        # 为了看到“起伏”，我们绘制每段音频各情绪的置信度变化
-        # 这里的 color_map 使用你在 emotion_engine.py 里定义的那个
         fig = px.line(df, x="time", y="confidence", color="emotion",
                       title="Raw Emotion Confidence Timeline",
                       markers=True,
@@ -79,7 +86,6 @@ def process_audio(audio_path):
             legend_title="Emotions"
         )
 
-        # 获取主要情绪
         top_emotion = df['emotion'].mode()[0] if not df.empty else "Neutral"
 
         # 4. LLM Scam Analysis
@@ -88,6 +94,7 @@ def process_audio(audio_path):
         
         # 5. Global Risk
         total_risk = scam_score
+        # 【修正全局风险权重】只有确实是 AI 且置信度高时才拉满风险
         if is_ai and ai_conf > 0.8:
             total_risk = max(total_risk, 98)
         elif is_ai:
